@@ -7,7 +7,7 @@
   --rule: rgba(26, 35, 50, 0.1);
   --drawer-peek: 3dvh;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --display: 'Tw Cen MT Condensed', 'Tw Cen MT', Oswald, 'Arial Narrow', sans-serif;
+  --display: 'EB Garamond', Garamond, 'Times New Roman', serif;
   --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font: 17px/1.45 var(--sans);
   color: var(--ink);
