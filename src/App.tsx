@@ -10,7 +10,6 @@ function BookRow({ book, onOpen }: { book: Book; onOpen: (book: Book) => void })
   return (
     <li>
       <button className="row" type="button" onClick={() => onOpen(book)}>
-        <span className="order">{String(book.order).padStart(2, '0')}</span>
         <span className="row-copy">
           <strong>{book.name}</strong>
           <em>

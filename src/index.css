@@ -87,14 +87,13 @@ body:has([data-vaul-drawer][data-state='open']) .app {
 .top {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
 }
 
 .mark,
 .when,
 .meta,
-.shelf h2,
-.order {
+.shelf h2 {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -104,6 +103,14 @@ body:has([data-vaul-drawer][data-state='open']) .app {
 
 .mark {
   color: #fff;
+}
+
+.mark,
+.when {
+  padding: 0.38rem 0.7rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 999px;
+  background: #171717;
 }
 
 .when {
@@ -152,9 +159,7 @@ main {
 .row {
   width: 100%;
   min-height: 3.15rem;
-  display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  gap: 0.35rem;
+  display: flex;
   align-items: center;
   padding: 0.7rem 0.95rem;
   text-align: left;
@@ -165,10 +170,6 @@ main {
 
 .shelf li:last-child .row {
   border-bottom: 0;
-}
-
-.order {
-  color: #e8e8e8;
 }
 
 .row-copy {
