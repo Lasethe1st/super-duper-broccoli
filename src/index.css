@@ -75,8 +75,8 @@ body:has([data-vaul-drawer][data-state='open']) .page {
 
 @media (max-width: 734px) {
   .app {
-    padding: 8px 8px calc(2rem + env(safe-area-inset-bottom));
-    padding-top: calc(8px + env(safe-area-inset-top));
+    padding: 16px 16px calc(2rem + env(safe-area-inset-bottom));
+    padding-top: calc(16px + env(safe-area-inset-top));
   }
 }
 
@@ -127,18 +127,20 @@ main {
 .feature {
   display: block;
   width: 100%;
-  padding: 0;
-  background: none;
+  padding: 24px;
+  background: #080808;
+  border: 1px solid #202020;
+  border-radius: 1rem;
   text-align: left;
   transition: transform 160ms var(--ease-out);
 }
 
 .feature-verse {
   font-family: var(--display);
-  font-size: clamp(1.35rem, 5.6vw, 1.85rem);
+  font-size: clamp(1.75rem, 7vw, 2.35rem);
   font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   color: #fff;
 }
 
