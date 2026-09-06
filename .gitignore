@@ -1,0 +1,7 @@
+node_modules
+dist
+.vercel-upload
+canon-github
+canon-vercel.zip
+.cursor
+*.local
