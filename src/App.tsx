@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Drawer } from 'vaul'
 import { featured, next, old, type Book } from './bible'
+import { loadBookText, type BookText } from './reader'
 
 function openLater(action: () => void) {
   window.setTimeout(action, 10)
@@ -24,11 +25,40 @@ function BookRow({ book, onOpen }: { book: Book; onOpen: (book: Book) => void })
 export default function App() {
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<Book | null>(null)
+  const [bookText, setBookText] = useState<BookText | null>(null)
+  const [loadError, setLoadError] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
+  const [chapterJump, setChapterJump] = useState(1)
+  const chapterNodes = useRef<Record<number, HTMLElement | null>>({})
   const book = selected ?? featured
+
+  useEffect(() => {
+    if (!open) return
+
+    const controller = new AbortController()
+    setBookText(null)
+    setLoadError('')
+    setChapterJump(1)
+    chapterNodes.current = {}
+
+    loadBookText(book.id, controller.signal)
+      .then(setBookText)
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setLoadError(error instanceof Error ? error.message : 'Unable to load this book')
+      })
+
+    return () => controller.abort()
+  }, [book.id, open, reloadKey])
 
   function show(nextBook: Book) {
     setSelected(nextBook)
     openLater(() => setOpen(true))
+  }
+
+  function goToChapter(chapter: number) {
+    setChapterJump(chapter)
+    chapterNodes.current[chapter]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
@@ -95,15 +125,76 @@ export default function App() {
                 </p>
                 <Drawer.Title className="drawer-title">{book.name}</Drawer.Title>
                 <Drawer.Description className="drawer-writer">{book.writer}</Drawer.Description>
-
-                <blockquote className="verse">
-                  <p>{book.verse}</p>
-                  <cite>
-                    {book.name} {book.cite}
-                  </cite>
-                </blockquote>
-
                 <p className="liner">{book.about}</p>
+
+                <div className="reader-rule" />
+
+                {bookText ? (
+                  <>
+                    <nav className="chapter-nav" aria-label={`${book.name} chapter navigation`}>
+                      <button
+                        type="button"
+                        aria-label="Previous chapter"
+                        disabled={chapterJump === 1}
+                        onClick={() => goToChapter(chapterJump - 1)}
+                      >
+                        ←
+                      </button>
+                      <label>
+                        <span>Chapter</span>
+                        <select
+                          value={chapterJump}
+                          onChange={(event) => goToChapter(Number(event.target.value))}
+                        >
+                          {bookText.chapters.map((chapter) => (
+                            <option key={chapter.number} value={chapter.number}>
+                              {chapter.number}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button
+                        type="button"
+                        aria-label="Next chapter"
+                        disabled={chapterJump === bookText.chapters.length}
+                        onClick={() => goToChapter(chapterJump + 1)}
+                      >
+                        →
+                      </button>
+                    </nav>
+
+                    <article className="reader" aria-label={`${book.name}, World English Bible`}>
+                      {bookText.chapters.map((chapter) => (
+                        <section
+                          className="reader-chapter"
+                          id={`${book.id}-chapter-${chapter.number}`}
+                          key={chapter.number}
+                          ref={(node) => {
+                            chapterNodes.current[chapter.number] = node
+                          }}
+                        >
+                          <h2>Chapter {chapter.number}</h2>
+                          {chapter.paragraphs.map((paragraph, index) => (
+                            <p key={index}>{paragraph}</p>
+                          ))}
+                        </section>
+                      ))}
+                    </article>
+                  </>
+                ) : loadError ? (
+                  <div className="reader-status" role="alert">
+                    <p>{loadError}</p>
+                    <button type="button" onClick={() => setReloadKey((key) => key + 1)}>
+                      Try again
+                    </button>
+                  </div>
+                ) : (
+                  <p className="reader-status" role="status">
+                    Opening {book.name}…
+                  </p>
+                )}
+
+                <footer className="reader-credit">World English Bible · Public domain</footer>
               </div>
             </div>
           </Drawer.Content>
