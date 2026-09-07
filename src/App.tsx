@@ -36,10 +36,6 @@ export default function App() {
     if (!open) return
 
     const controller = new AbortController()
-    setBookText(null)
-    setLoadError('')
-    setChapterJump(1)
-    chapterNodes.current = {}
 
     loadBookText(book.id, controller.signal)
       .then(setBookText)
@@ -52,13 +48,27 @@ export default function App() {
   }, [book.id, open, reloadKey])
 
   function show(nextBook: Book) {
+    setBookText(null)
+    setLoadError('')
+    setChapterJump(1)
+    chapterNodes.current = {}
     setSelected(nextBook)
     openLater(() => setOpen(true))
   }
 
   function goToChapter(chapter: number) {
     setChapterJump(chapter)
-    chapterNodes.current[chapter]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    chapterNodes.current[chapter]?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }
+
+  function retryLoad() {
+    setBookText(null)
+    setLoadError('')
+    setReloadKey((key) => key + 1)
   }
 
   return (
@@ -184,7 +194,7 @@ export default function App() {
                 ) : loadError ? (
                   <div className="reader-status" role="alert">
                     <p>{loadError}</p>
-                    <button type="button" onClick={() => setReloadKey((key) => key + 1)}>
+                    <button type="button" onClick={retryLoad}>
                       Try again
                     </button>
                   </div>
